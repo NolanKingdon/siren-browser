@@ -1,6 +1,7 @@
+import { Event } from "../events/Event";
 
 interface WebviewGenerator {
-    sendEvent(event: any): void // TODO
+    sendEvent(event: Event): void 
 }
 
 export default WebviewGenerator;
