@@ -1,26 +1,49 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-siren" is now active!');
+	const treeProvider = new SirenTreeProvider(context.extensionUri);
+	context.subscriptions.push(vscode.window.registerWebviewViewProvider(SirenTreeProvider.viewType, treeProvider));
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-siren.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode-siren!');
+	const test = vscode.window.createWebviewPanel('test', 'test', vscode.ViewColumn.One, {
+		enableScripts: true
 	});
 
-	context.subscriptions.push(disposable);
+	test.webview.html = '<html><body><h1>Working</h1></body></html>';
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	// TODO
+}
+
+class SirenTreeProvider implements vscode.WebviewViewProvider {
+	
+	public static readonly viewType = 'sirenBrowser.requestTree';
+	private _view?: vscode.WebviewView;
+
+	constructor(private readonly _extensionUri: vscode.Uri) {}
+
+	resolveWebviewView(
+		webviewView: vscode.WebviewView, 
+		context: vscode.WebviewViewResolveContext<unknown>, 
+		token: vscode.CancellationToken
+	): void | Thenable<void> {
+		webviewView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [
+				this._extensionUri
+			]
+		};
+
+		webviewView.webview.html = `
+		 <!DOCTYPE html>
+			<html>
+				<body>
+					<button>New Request</button>
+					<h1>This will be something else</h1>
+				</body>
+			</html>
+		`;
+
+		this._view = webviewView;
+	}
+}

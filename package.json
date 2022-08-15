@@ -10,16 +10,28 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscode-siren.helloWorld"
+    "onView:sirenBrowser.requestTree"
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "vscode-siren.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sirenBrowser",
+          "title": "Siren Browser",
+          "icon": "$(eye)"
+        }
+      ]
+    },
+    "views": {
+      "sirenBrowser": [
+        {
+          "type": "webview",
+          "id": "sirenBrowser.requestTree",
+          "name": "Tree View"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
