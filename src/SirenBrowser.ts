@@ -91,6 +91,10 @@ class SirenBrowser {
 
             switch(e.type) {
                 case EventType.contentHrefUpdate:
+                    console.log(e.content.href);
+                    console.log(e.content.token);
+                    // TODO -> Make request
+                    // TODO -> Store in tree
                     break;
                 case EventType.contentLinkClicked:
                     break;

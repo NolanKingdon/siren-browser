@@ -29,7 +29,12 @@ export class ContentWebView implements WebviewGenerator {
         this.panel.webview.html = `
             <html>
                 <body>
-                    <div id='content-container'>placeholder</h1>
+                    <div id='content-inputs'>
+                        <input id='content-href' type='text' placeholder='Href' />
+                        <input id='content-token' type='text' placeholder='Token' />
+                        <button>Go</button>
+                    </div>
+                    <div id='content-container'></div>
                     <script>${this.generateHtmlEvents()}</script>
                 </body>
             </html>
@@ -40,6 +45,19 @@ export class ContentWebView implements WebviewGenerator {
         return `
             const vscode = acquireVsCodeApi();
             const container = document.getElementById('content-container');
+            const submit = document.querySelector('#content-inputs button');
+            const token = document.querySelector('#content-token');
+            const href = document.querySelector('#content-href');
+
+            submit.addEventListener('click', event => {
+                vscode.postMessage({
+                    type: ${EventType.contentHrefUpdate},
+                    content: {
+                        href: href.value,
+                        token: token.value
+                    }
+                })
+            });
 
             window.addEventListener('message', event => {
                             if(event.isTrusted) {

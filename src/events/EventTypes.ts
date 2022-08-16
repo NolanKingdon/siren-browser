@@ -7,5 +7,6 @@ export enum EventType {
     // Tree Events
     treeLinkAdded,
     treeLinkRemoved,
-    treeLinkClicked
+    treeLinkClicked,
+    treeNewRequest
 }
