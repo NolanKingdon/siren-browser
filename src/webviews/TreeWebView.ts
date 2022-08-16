@@ -5,12 +5,14 @@ import WebviewGenerator from "./WebviewGenerator";
 
 export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider {
 	
+	public view?: vscode.WebviewView;
 	public static readonly viewType = 'sirenBrowser.requestTree';
     private readonly _extensionUri: vscode.Uri;
-	private _view?: vscode.WebviewView;
+    private readonly _eventCallback: (view: vscode.Webview) => void;
 
-	constructor(extensionUri: vscode.Uri) {
+	constructor(extensionUri: vscode.Uri, eventCallback: (view: vscode.Webview) => void) {
         this._extensionUri = extensionUri;
+        this._eventCallback = eventCallback;
     }
 
 	resolveWebviewView(
@@ -25,18 +27,18 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 			]
 		};
 
-		this._view = webviewView;
-        this.loadEventHandlers();
+		this.view = webviewView;
         this.generateHtml();
+        this._eventCallback(this.view.webview);
 	}
 
     sendEvent(event: Event) {
-        this._view?.webview.postMessage(event);
+        this.view?.webview.postMessage(event);
     }
 
     private generateHtml(): void {
-        if (this._view) {
-            this._view.webview.html = `
+        if (this.view) {
+            this.view.webview.html = `
                 <html>
                     <body>
                         <button>New Request</button>
@@ -52,6 +54,16 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
         return `
             const vscode = acquireVsCodeApi();
             const container = document.getElementById('tree-container');
+            const newBtn = document.querySelector('button')
+
+            newBtn.addEventListener('click', e => {
+                vscode.postMessage(${
+                    new Event(
+                        EventType.treeNewRequest,
+                        ''
+                    ).toHtml()
+                });
+            });
 
             window.addEventListener('message', event => {
                             if(event.isTrusted) {
@@ -65,22 +77,6 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
                                 }
                             }
                         })
-
-            setTimeout(
-                () => vscode.postMessage(${new Event(EventType.treeLinkClicked, 'Cool').toHtml()}),
-                5000
-            );
         `;
-    }
-
-    private loadEventHandlers(): void {
-        this._view?.webview.onDidReceiveMessage((e: any) => {
-            vscode.window.showInformationMessage(
-                `Event recieved for TreeWebView. 
-                    Type: ${EventType[e.type]}
-                    Content: ${e.content}
-                `
-            );
-        });
     }
 }

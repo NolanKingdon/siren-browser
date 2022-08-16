@@ -1,31 +1,24 @@
 import * as vscode from 'vscode';
-import { Event } from './events/Event';
-import { EventType } from './events/EventTypes';
-import { ContentWebView } from './webviews/ContentWebView';
-import { TreeWebView } from './webviews/TreeWebView';
+import SirenBrowser from './SirenBrowser';
+
+let app: SirenBrowser;
 
 export function activate(context: vscode.ExtensionContext) {
-	const treeProvider = new TreeWebView(context.extensionUri);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(
-			TreeWebView.viewType,
-			treeProvider
-		)
-	);
+	app = new SirenBrowser(context);
 
-	const contentView = new ContentWebView();
-
-	setTimeout(() => treeProvider.sendEvent(new Event(
-		EventType.treeLinkAdded,
-		'I am only a test'
-	)), 2000);
-	
-	setTimeout(() => contentView.sendEvent(new Event(
-		EventType.contentUpdated,
-		'I am only a test'
-	)), 2000);
+	// TODO 
+	// - Documentation
+	// - Save state so we don't have to reload everything every time we click
+	// - Styles 
+	// - Actual Tree
+	//		- Delete nodes
+	//		- Navigate to nodes (Re-request probably best)
+	// - Content View
+	//		- Inputs
+	//		- Display: Siren Entity structure
+	// - Deactivate functions?
 }
 
 export function deactivate() {
-	// TODO
+	app.deactivate();
 }

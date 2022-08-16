@@ -5,7 +5,8 @@ import WebviewGenerator from './WebviewGenerator';
 
 export class ContentWebView implements WebviewGenerator {
     
-    panel: vscode.WebviewPanel;
+    public panel: vscode.WebviewPanel;
+    public disposed: boolean = false;
 
     constructor() {
         this.panel = vscode.window.createWebviewPanel(
@@ -17,7 +18,6 @@ export class ContentWebView implements WebviewGenerator {
             }
         );
         
-        this.loadEventHandlers();
         this.generateHtml();
     }
 
@@ -60,16 +60,5 @@ export class ContentWebView implements WebviewGenerator {
                 5000
             );
         `;
-    }
-
-    private loadEventHandlers(): void {
-        this.panel.webview.onDidReceiveMessage((e: any) => {
-            vscode.window.showInformationMessage(
-                `Event recieved for TreeWebView. 
-                    Type: ${EventType[e.type]}
-                    Content: ${e.content}
-                `
-            );
-        });
     }
 }
