@@ -11,7 +11,7 @@ export class ContentWebView implements WebviewGenerator {
     constructor() {
         this.panel = vscode.window.createWebviewPanel(
             'sirenContent',
-            'Siren Content',
+            'Siren Browser',
             vscode.ViewColumn.One,
             {
                 enableScripts: true
@@ -60,26 +60,19 @@ export class ContentWebView implements WebviewGenerator {
             });
 
             window.addEventListener('message', event => {
-                            if(event.isTrusted) {
-                                switch(event.data.type) {
-                                    case ${EventType.contentUpdated}:
-                                        const content = event.data.content;
-                                        href.value = content.href;
-                                        token.value = content.token;
-                                        container.innerHTML = content.html;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        })
-
-            setTimeout(
-                () => vscode.postMessage(
-                    ${new Event(EventType.contentLinkClicked, 'Cool').toHtml()}
-                ),
-                5000
-            );
+                if(event.isTrusted) {
+                    switch(event.data.type) {
+                        case ${EventType.contentUpdated}:
+                            const content = event.data.content;
+                            href.value = content.href;
+                            token.value = content.token;
+                            container.innerHTML = content.html;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
         `;
     }
 }

@@ -66,17 +66,17 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
             });
 
             window.addEventListener('message', event => {
-                            if(event.isTrusted) {
-                                console.log(event);
-                                switch(event.data.type) {
-                                    case ${EventType.treeLinkAdded}:
-                                        container.innerHTML = event.data.content;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        })
+                if(event.isTrusted) {
+                    console.log(event);
+                    switch(event.data.type) {
+                        case ${EventType.treeLinkAdded}:
+                            container.innerHTML = event.data.content;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            })
         `;
     }
 }

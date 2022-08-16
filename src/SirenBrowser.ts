@@ -14,11 +14,6 @@ class SirenBrowser {
         this._context = context;
         const treeProvider = this.generateTreeProvider();
         this._treeView = treeProvider.view;
-
-        setTimeout(() => treeProvider.sendEvent(new Event(
-            EventType.treeLinkAdded,
-            'I am only a test'
-        )), 2000);
     }
 
     deactivate() {
