@@ -51,7 +51,7 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
     }
 
     private generateHtmlEvents(): string {
-        return `
+        return /*javascript*/`
             const vscode = acquireVsCodeApi();
             const container = document.getElementById('tree-container');
             const newBtn = document.querySelector('button')

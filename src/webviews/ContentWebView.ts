@@ -42,7 +42,7 @@ export class ContentWebView implements WebviewGenerator {
     }
 
     private generateHtmlEvents(): string {
-        return `
+        return /*javascript*/`
             const vscode = acquireVsCodeApi();
             const container = document.getElementById('content-container');
             const submit = document.querySelector('#content-inputs button');
