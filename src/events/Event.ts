@@ -13,3 +13,15 @@ export class Event {
         return JSON.stringify(this);
     }
 };
+
+export class ContentUpdate {
+    href: string;
+    token: string;
+    html: string;
+
+    constructor(href: string, token: string, html: string) {
+        this.href = href;
+        this.token = token;
+        this.html = html;
+    }
+}

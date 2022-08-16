@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Event } from './events/Event';
+import { ContentUpdate, Event } from './events/Event';
 import { EventType } from './events/EventTypes';
 import { ContentWebView } from './webviews/ContentWebView';
 import { TreeWebView } from './webviews/TreeWebView';
@@ -69,7 +69,11 @@ class SirenBrowser {
                     _this._contentView?.sendEvent(
                         new Event(
                             EventType.contentUpdated,
-                            '<h1>Yes</h1>' // TODO -> object describing fields/content?
+                            new ContentUpdate(
+                                '',
+                                '',
+                                '<h1>New</h1>'
+                            ) 
                         )
                     );
 

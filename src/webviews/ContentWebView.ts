@@ -63,7 +63,10 @@ export class ContentWebView implements WebviewGenerator {
                             if(event.isTrusted) {
                                 switch(event.data.type) {
                                     case ${EventType.contentUpdated}:
-                                        container.innerHTML = event.data.content;
+                                        const content = event.data.content;
+                                        href.value = content.href;
+                                        token.value = content.token;
+                                        container.innerHTML = content.html;
                                         break;
                                     default:
                                         break;
