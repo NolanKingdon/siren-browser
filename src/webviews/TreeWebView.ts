@@ -42,7 +42,7 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
                 <html>
                     <body>
                         <button>New Request</button>
-                        <div id="tree-container">Initial</div>
+                        <div id="tree-container"></div>
                         <script>${this.generateHtmlEvents()}</script>
                     </body>
                 </html>
@@ -67,10 +67,9 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 
             window.addEventListener('message', event => {
                 if(event.isTrusted) {
-                    console.log(event);
                     switch(event.data.type) {
                         case ${EventType.treeLinkAdded}:
-                            container.innerHTML = event.data.content;
+                            container.innerHTML += event.data.content;
                             break;
                         default:
                             break;

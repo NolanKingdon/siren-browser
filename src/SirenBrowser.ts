@@ -5,15 +5,14 @@ import { ContentWebView } from './webviews/ContentWebView';
 import { TreeWebView } from './webviews/TreeWebView';
 
 class SirenBrowser {
-
     private _context: vscode.ExtensionContext;
-    private _treeView?: vscode.WebviewView;
+    private _treeView?: TreeWebView;
     private _contentView?: ContentWebView;
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
         const treeProvider = this.generateTreeProvider();
-        this._treeView = treeProvider.view;
+        this._treeView = treeProvider;
     }
 
     deactivate() {
@@ -90,10 +89,19 @@ class SirenBrowser {
 
             switch(e.type) {
                 case EventType.contentHrefUpdate:
-                    console.log(e.content.href);
-                    console.log(e.content.token);
-                    // TODO -> Make request
-                    // TODO -> Store in tree
+                    // TODO - Tree HTML Serializer
+                    const html = `
+                        <p>${e.content.href}</p>
+                    `;
+
+                    this._treeView?.sendEvent(
+                        new Event(
+                            EventType.treeLinkAdded,
+                            html
+                        )
+                    );
+                   
+
                     break;
                 case EventType.contentLinkClicked:
                     break;
