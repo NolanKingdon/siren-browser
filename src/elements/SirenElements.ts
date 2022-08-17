@@ -1,3 +1,5 @@
+import { Event } from "../events/Event";
+import { EventType } from "../events/EventTypes";
 import { Renderable } from "./Renderable";
 /**
  * This exists in a single file due to circular dependencies and difficult
@@ -11,7 +13,7 @@ export class SirenBase {
     entities: SirenEntity[];
     links: SirenLink[];
     properties: {[key: string]: any};
-    rel: string;
+    rel: string[];
     title: string;
 
     constructor(json: any) {
@@ -72,7 +74,12 @@ export class SirenEntity extends SirenBase implements Renderable {
                 : ``
             }
             ${this.entities.length !== 0 ? this.entities.map( entity => entity.render()) : ``}
-            ${this.links.length !== 0 ? this.links.map( link => link.render()) : ``}
+            ${
+                this.links.length !== 0 
+                ? `
+                    <h2>Links</h2>
+                    ${this.links.map( link => link.render())}
+                ` : ``}
             ${Object.keys(this.properties).map( prop => `<p>${prop} -> ${this.properties[prop]}</p>`)}
         `;
     }
@@ -97,7 +104,25 @@ export class SirenLink extends SirenBase implements Renderable {
 
     public render(): string {
         return `
-
+            <p>Rel: [ ${
+                this.rel.map( // TODO -> Pull styles into css file
+                    r => `
+                        <span 
+                            style='color: cyan; text-decoration: underline;'
+                            onclick='(function(){
+                                vscode.postMessage(${
+                                    new Event(
+                                        EventType.contentLinkClicked,
+                                        this.href
+                                    ).toHtml()
+                                })
+                            })()'
+                        >
+                            ${r}
+                        </span>
+                    `
+                )
+            } ]</p>
         `;
     }
 }

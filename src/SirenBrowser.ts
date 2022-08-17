@@ -100,6 +100,7 @@ class SirenBrowser {
 
                     break;
                 case EventType.contentHrefUpdate:
+                case EventType.contentLinkClicked:
                     // TODO - Tree HTML Serializer
                     // TODO - some way to hold this in state so when we
                     //      nav off the actionBar, it sticks around.
@@ -116,8 +117,6 @@ class SirenBrowser {
                     
                     await this.fetchAndUpdateContent(href);
 
-                    break;
-                case EventType.contentLinkClicked:
                     break;
                 case EventType.contentUpdated:
                     break;
