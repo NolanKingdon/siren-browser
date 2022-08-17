@@ -5,6 +5,7 @@ import { ContentWebView } from './webviews/ContentWebView';
 import { TreeWebView } from './webviews/TreeWebView';
 import  fetch from 'node-fetch';
 import { TreeItem } from './elements/TreeItem';
+import { SirenEntity } from './elements/SirenElements';
 
 class SirenBrowser {
     private _context: vscode.ExtensionContext;
@@ -134,17 +135,19 @@ class SirenBrowser {
             .then(res => res.json())
             .catch(e => console.log(e));
         
+        console.log(res);
+
+        const entity = new SirenEntity(res);
+
+        console.log(entity);
+
         this._contentView?.sendEvent(
             new Event(
                 EventType.contentUpdated,
                 new ContentUpdate(
                     href,
                     '',
-                    // TODO -> Actual Siren Stuff. This is based on pokeapi
-                    `
-                        <h1>${res.name}</h1>
-                        <img src='${res.sprites.front_default}' alt='${res.name} Sprite'/>
-                    `
+                    entity.render()
                 )
             )
         );
