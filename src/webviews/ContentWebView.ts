@@ -65,7 +65,8 @@ export class ContentWebView implements WebviewGenerator {
                         case ${EventType.contentUpdated}:
                             const content = event.data.content;
                             href.value = content.href;
-                            token.value = content.token;
+                            // TODO decide what to do with token: 
+                            // token.value = content.token;
                             container.innerHTML = content.html;
                             break;
                         default:

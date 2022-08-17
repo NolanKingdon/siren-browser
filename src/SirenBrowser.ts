@@ -3,6 +3,8 @@ import { ContentUpdate, Event } from './events/Event';
 import { EventType } from './events/EventTypes';
 import { ContentWebView } from './webviews/ContentWebView';
 import { TreeWebView } from './webviews/TreeWebView';
+import  fetch from 'node-fetch';
+import { TreeItem } from './elements/TreeItem';
 
 class SirenBrowser {
     private _context: vscode.ExtensionContext;
@@ -11,8 +13,7 @@ class SirenBrowser {
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
-        const treeProvider = this.generateTreeProvider();
-        this._treeView = treeProvider;
+        this._treeView = this.generateTreeProvider();
     }
 
     deactivate() {
@@ -40,7 +41,7 @@ class SirenBrowser {
      * @param _this context of SirenBrowser to modify state when used as callback
      */
     private generateTreeEvents(_this: SirenBrowser, view: vscode.Webview) {
-        view.onDidReceiveMessage((e: any) => {
+        view.onDidReceiveMessage(async (e: any) => {
             vscode.window.showInformationMessage(
                 `Event recieved for TreeWebView. 
                     Type: ${EventType[e.type]}
@@ -49,9 +50,8 @@ class SirenBrowser {
             );
 
             switch (e.type){
-                case EventType.treeLinkAdded:
-                    break;
                 case EventType.treeLinkClicked:
+                    await this.fetchAndUpdateContent(e.content);
                     break;
                 case EventType.treeLinkRemoved:
                     break;
@@ -79,7 +79,7 @@ class SirenBrowser {
     }
 
     private generateContentViewEvents(view: ContentWebView) {
-        view.panel.webview.onDidReceiveMessage((e: any) => {
+        view.panel.webview.onDidReceiveMessage(async (e: any) => {
             vscode.window.showInformationMessage(
                 `Event recieved for ContentWebView. 
                     Type: ${EventType[e.type]}
@@ -90,17 +90,20 @@ class SirenBrowser {
             switch(e.type) {
                 case EventType.contentHrefUpdate:
                     // TODO - Tree HTML Serializer
-                    const html = `
-                        <p>${e.content.href}</p>
-                    `;
+                    // TODO - some way to hold this in state so when we
+                    //      nav off the actionBar, it sticks around.
+                    //      Preferably when you close/re-open vscode
+                    const href = e.content.href;
+                    const html = new TreeItem(href);
 
                     this._treeView?.sendEvent(
                         new Event(
                             EventType.treeLinkAdded,
-                            html
+                            html.render()
                         )
                     );
-                   
+                    
+                    await this.fetchAndUpdateContent(href);
 
                     break;
                 case EventType.contentLinkClicked:
@@ -110,6 +113,7 @@ class SirenBrowser {
                 default:
                     break;
             }
+
         });
     }
 
@@ -123,6 +127,27 @@ class SirenBrowser {
         this.generateContentViewEvents(view);
 
         return view;
+    }
+
+    private async fetchAndUpdateContent(href: string): Promise<void> {
+        const res: any = await fetch(href)
+            .then(res => res.json())
+            .catch(e => console.log(e));
+        
+        this._contentView?.sendEvent(
+            new Event(
+                EventType.contentUpdated,
+                new ContentUpdate(
+                    href,
+                    '',
+                    // TODO -> Actual Siren Stuff. This is based on pokeapi
+                    `
+                        <h1>${res.name}</h1>
+                        <img src='${res.sprites.front_default}' alt='${res.name} Sprite'/>
+                    `
+                )
+            )
+        );
     }
 }
 
