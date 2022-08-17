@@ -63,6 +63,22 @@ export class SirenEntity extends SirenBase implements Renderable {
                 <h1>Class</h1>
                 <p>[ ${this.class.map( c => ` ${c}`)} ] </p>
             </div>
+            ${this.renderEntityContents()}
+        `;
+    }
+
+    private renderSubEntity(): string {
+        return `
+            <div class='siren-sub-entity'>
+                <h3>Sub Class</h3>
+                <p>[ ${this.class.map( c => ` ${c}`)}]</p>
+                ${this.renderEntityContents()}
+            </div>
+        `;
+    }
+
+    private renderEntityContents(): string {
+        return `
             ${
                 this.actions.length !== 0 
                 ? `
@@ -73,7 +89,13 @@ export class SirenEntity extends SirenBase implements Renderable {
                 `
                 : ``
             }
-            ${this.entities.length !== 0 ? this.entities.map( entity => entity.render()) : ``}
+            ${
+                this.entities.length !== 0 
+                    ? `
+                        <h2>Sub Entities</h2>
+                        ${this.entities.map( entity => entity.render())}
+                    `
+                    : ``}
             ${
                 this.links.length !== 0 
                 ? `
@@ -82,10 +104,6 @@ export class SirenEntity extends SirenBase implements Renderable {
                 ` : ``}
             ${Object.keys(this.properties).map( prop => `<p>${prop} -> ${this.properties[prop]}</p>`)}
         `;
-    }
-
-    private renderSubEntity(): string {
-        return ``;
     }
 }
 
