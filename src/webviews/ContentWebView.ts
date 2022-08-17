@@ -49,14 +49,28 @@ export class ContentWebView implements WebviewGenerator {
             const token = document.querySelector('#content-token');
             const href = document.querySelector('#content-href');
 
+            const originalToken = token.value;
+            const originalHref = href.value;
+
             submit.addEventListener('click', event => {
-                vscode.postMessage({
-                    type: ${EventType.contentHrefUpdate},
-                    content: {
-                        href: href.value,
-                        token: token.value
-                    }
-                })
+                // This needs to update first. Don't want the href to try and update
+                //  if we have token changes as well.
+                if(originalToken !== token.value) {
+                    vscode.postMessage({
+                        type: ${EventType.contentTokenUpdate},
+                        content: {
+                            token: token.value,
+                            href: href.value
+                        }
+                    })
+                }
+
+                if(originalHref !== href.value) {
+                    vscode.postMessage({
+                        type: ${EventType.contentHrefUpdate},
+                        content: href.value
+                    })
+                }
             });
 
             window.addEventListener('message', event => {
@@ -65,8 +79,6 @@ export class ContentWebView implements WebviewGenerator {
                         case ${EventType.contentUpdated}:
                             const content = event.data.content;
                             href.value = content.href;
-                            // TODO decide what to do with token: 
-                            // token.value = content.token;
                             container.innerHTML = content.html;
                             break;
                         default:

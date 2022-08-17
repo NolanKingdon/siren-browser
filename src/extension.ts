@@ -17,6 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 	//		- Inputs
 	//		- Display: Siren Entity structure
 	// - Deactivate functions?
+	// - Error Handling (Bad requests, events, etc.)
+	//		- If we 401, we need to be shown that upfront and loudly
 }
 
 export function deactivate() {

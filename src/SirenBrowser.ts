@@ -8,6 +8,7 @@ import { TreeItem } from './elements/TreeItem';
 import { SirenEntity } from './elements/SirenElements';
 
 class SirenBrowser {
+    private _authToken: string;
     private _context: vscode.ExtensionContext;
     private _treeView?: TreeWebView;
     private _contentView?: ContentWebView;
@@ -15,6 +16,7 @@ class SirenBrowser {
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
         this._treeView = this.generateTreeProvider();
+        this._authToken = '';
     }
 
     deactivate() {
@@ -89,12 +91,20 @@ class SirenBrowser {
             );
 
             switch(e.type) {
+                case EventType.contentTokenUpdate:
+                    this._authToken = e.content.token;
+                    const unchangedHref = e.content.href;
+                    
+                    // Reload once the new token is assigned
+                    await this.fetchAndUpdateContent(unchangedHref);
+
+                    break;
                 case EventType.contentHrefUpdate:
                     // TODO - Tree HTML Serializer
                     // TODO - some way to hold this in state so when we
                     //      nav off the actionBar, it sticks around.
                     //      Preferably when you close/re-open vscode
-                    const href = e.content.href;
+                    const href = e.content;
                     const html = new TreeItem(href);
 
                     this._treeView?.sendEvent(
@@ -131,7 +141,14 @@ class SirenBrowser {
     }
 
     private async fetchAndUpdateContent(href: string): Promise<void> {
-        const res: any = await fetch(href)
+        const options = this._authToken 
+            ? { 
+                headers: {
+                    'authorization': `Bearer ${this._authToken}`
+                }
+             } 
+            : {};
+        const res: any = await fetch(href, options)
             .then(res => res.json())
             .catch(e => console.log(e));
         
