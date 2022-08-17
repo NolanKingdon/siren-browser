@@ -58,10 +58,19 @@ export class SirenEntity extends SirenBase implements Renderable {
     private renderBaseEntity(): string {
         return `
             <div class='siren-entity'>
-                <h2>Class</h2>
+                <h1>Class</h1>
                 <p>[ ${this.class.map( c => ` ${c}`)} ] </p>
             </div>
-            ${this.actions.length !== 0 ? this.actions.map( action => action.render()) : ``}
+            ${
+                this.actions.length !== 0 
+                ? `
+                        <div class='siren-actions'>
+                            <h2>Actions</h2>
+                            ${this.actions.map( action => action.render())}
+                        </div>
+                `
+                : ``
+            }
             ${this.entities.length !== 0 ? this.entities.map( entity => entity.render()) : ``}
             ${this.links.length !== 0 ? this.links.map( link => link.render()) : ``}
             ${Object.keys(this.properties).map( prop => `<p>${prop} -> ${this.properties[prop]}</p>`)}
@@ -87,13 +96,15 @@ export class SirenLink extends SirenBase implements Renderable {
     }
 
     public render(): string {
-        return ``;
+        return `
+
+        `;
     }
 }
 
 export class SirenAction extends SirenBase implements Renderable {
     private name: string;
-    private fields: string[];
+    private fields: { type: string, name: string, value: any}[];
     private href: string;
     private method: string;
     private type: string;
@@ -110,6 +121,20 @@ export class SirenAction extends SirenBase implements Renderable {
     }
 
     public render(): string {
-        return ``;
+        // TODO -> Following these
+        return `
+            <h3>${this.name}${this.method ? ` - ${this.method}` : ``}</h3>
+            <h4>${this.href}</h4>
+            ${ 
+                this.fields.length !== 0
+                    ? `
+                        ${this.fields.map( field => `
+                            <label>${field.name}<input type=${field.type} value=${field.value} /></label>
+                        `)}
+                    `
+                    : ``
+            }
+            <button>Submit</button>
+        `;
     }
 }
