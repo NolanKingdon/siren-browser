@@ -48,14 +48,14 @@ export class ContentWebView implements WebviewGenerator {
             const submit = document.querySelector('#content-inputs button');
             const token = document.querySelector('#content-token');
             const href = document.querySelector('#content-href');
-
-            const originalToken = token.value;
-            const originalHref = href.value;
+            let originalToken = '';
+            let parentHref = '';
 
             submit.addEventListener('click', event => {
                 // This needs to update first. Don't want the href to try and update
                 //  if we have token changes as well.
                 if(originalToken !== token.value) {
+                    originalToken = token.value;
                     vscode.postMessage({
                         type: ${EventType.contentTokenUpdate},
                         content: {
@@ -65,11 +65,14 @@ export class ContentWebView implements WebviewGenerator {
                     })
                 }
 
-                if(originalHref !== href.value) {
+                if(parentHref !== href.value) {
                     vscode.postMessage({
                         type: ${EventType.contentHrefUpdate},
-                        content: href.value
-                    })
+                        content: {
+                            href: href.value,
+                            parent: '' // If we enter an entirely new href, it's not a descendent
+                        }
+                    });
                 }
             });
 
@@ -78,6 +81,7 @@ export class ContentWebView implements WebviewGenerator {
                     switch(event.data.type) {
                         case ${EventType.contentUpdated}:
                             const content = event.data.content;
+                            parentHref = href.value;
                             href.value = content.href;
                             container.innerHTML = content.html;
                             break;

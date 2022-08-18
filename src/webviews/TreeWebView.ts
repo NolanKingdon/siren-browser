@@ -69,7 +69,7 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
                 if(event.isTrusted) {
                     switch(event.data.type) {
                         case ${EventType.treeLinkAdded}:
-                            container.innerHTML += event.data.content;
+                            container.innerHTML = event.data.content;
                             break;
                         default:
                             break;

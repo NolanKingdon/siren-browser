@@ -6,6 +6,7 @@ import { Renderable } from "./Renderable";
  * to debug errors surrounding that.
  */
 
+let self = ''; // Thanks, I hate it.
 
 export class SirenBase {
     actions: SirenAction[];
@@ -16,7 +17,11 @@ export class SirenBase {
     rel: string[];
     title: string;
 
-    constructor(json: any) {
+    constructor(json: any, isRootEntity: boolean = false) {
+        if(isRootEntity) {
+            self = this.getSelf(json);
+        }
+
         this.actions = (json['actions'] || []).map(
             (a: any) => new SirenAction(a)
         );
@@ -34,6 +39,16 @@ export class SirenBase {
             (e: any) => e.href ? new SirenLink(e) : new SirenEntity(e, true)
         );
     }
+
+    private getSelf(json: any): string {
+        for(let link of json.links) {
+            if(link.rel.includes('self')) {
+                return link.href;
+            }
+        }
+
+        return self; 
+    }
 }
 
 export class SirenEntity extends SirenBase implements Renderable {
@@ -41,7 +56,7 @@ export class SirenEntity extends SirenBase implements Renderable {
     private isSubEntity: boolean;
 
     constructor(json: any, isSubEntity: boolean = false) {
-        super(json);
+        super(json, !isSubEntity);
         this.json = JSON.stringify(json);
         this.isSubEntity = isSubEntity;
     }
@@ -100,7 +115,7 @@ export class SirenEntity extends SirenBase implements Renderable {
                 this.links.length !== 0 
                 ? `
                     <h2>Links</h2>
-                    ${this.links.map( link => link.render())}
+                    ${this.links.map( link => link.render(self))}
                 ` : ``}
             ${Object.keys(this.properties).map( prop => `<p>${prop} -> ${this.properties[prop]}</p>`)}
         `;
@@ -120,7 +135,7 @@ export class SirenLink extends SirenBase implements Renderable {
         this.type = json['type'] || '';
     }
 
-    public render(): string {
+    public render(parent?: string): string {
         return `
             <p>Rel: [ ${
                 this.rel.map( // TODO -> Pull styles into css file
@@ -131,7 +146,10 @@ export class SirenLink extends SirenBase implements Renderable {
                                 vscode.postMessage(${
                                     new Event(
                                         EventType.contentLinkClicked,
-                                        this.href
+                                        {
+                                            href: this.href,
+                                            parent: parent || ''
+                                        }
                                     ).toHtml()
                                 })
                             })()'

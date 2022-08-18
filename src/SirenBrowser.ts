@@ -12,11 +12,13 @@ class SirenBrowser {
     private _context: vscode.ExtensionContext;
     private _treeView?: TreeWebView;
     private _contentView?: ContentWebView;
+    private _treeItems: TreeItem[];
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
         this._treeView = this.generateTreeProvider();
         this._authToken = '';
+        this._treeItems = [];
     }
 
     deactivate() {
@@ -101,17 +103,26 @@ class SirenBrowser {
                     break;
                 case EventType.contentHrefUpdate:
                 case EventType.contentLinkClicked:
-                    // TODO - Tree HTML Serializer
                     // TODO - some way to hold this in state so when we
                     //      nav off the actionBar, it sticks around.
                     //      Preferably when you close/re-open vscode
-                    const href = e.content;
-                    const html = new TreeItem(href);
+                    const href = e.content.href;
+
+                    console.log(e.content);
+                    const parent = this.getTreeItemByHref(e.content.parent);
+
+                    if (parent) {
+                        parent.addChild(e.content.href);
+                    } else {
+                        this._treeItems.push(new TreeItem(href));
+                    }
+
+                    const html = this.renderAllTreeLinks();
 
                     this._treeView?.sendEvent(
                         new Event(
                             EventType.treeLinkAdded,
-                            html.render()
+                            html
                         )
                     );
                     
@@ -127,6 +138,18 @@ class SirenBrowser {
         });
     }
 
+    private getTreeItemByHref(href: string): TreeItem | null {
+        for(let item of this._treeItems) {
+            const node = item.getNodeByHref(href);
+
+            if(node) {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
     private createContentView(): ContentWebView {
         const view = new ContentWebView();
 
@@ -137,6 +160,16 @@ class SirenBrowser {
         this.generateContentViewEvents(view);
 
         return view;
+    }
+
+    private renderAllTreeLinks(): string {
+        let result = '';
+
+        for(let treeItem of this._treeItems) {
+            result += treeItem.render();
+        }
+
+        return result;
     }
 
     private async fetchAndUpdateContent(href: string): Promise<void> {
@@ -151,11 +184,7 @@ class SirenBrowser {
             .then(res => res.json())
             .catch(e => console.log(e));
         
-        console.log(res);
-
         const entity = new SirenEntity(res);
-
-        console.log(entity);
 
         this._contentView?.sendEvent(
             new Event(
