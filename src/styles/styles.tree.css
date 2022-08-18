@@ -22,7 +22,7 @@
     margin: 0;
 }
 
-.siren-tree-node p:hover {
+.siren-tree-node div:hover {
     background-color: var(--vscode-textBlockQuote-background);
     cursor: pointer;
 }
