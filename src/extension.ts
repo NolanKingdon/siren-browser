@@ -13,6 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
 	//		- CSS
 	//		- Better Icon
 	// - Actual Tree
+	//		- Specific styles for highlighted node
 	//		- Delete nodes
 	//		- Short URL display
 	// - Content View
@@ -27,6 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
 	//	- Navigating to an existing base entity re-creates that base entity
 	//	- using .map() causes commas to be placed in between all content
 	//	- Content is not saved when navigating off of the tabs
+	// 	- HTML disappears when moving tab position?
+	//	- Links break everything if null
 }
 
 export function deactivate() {
