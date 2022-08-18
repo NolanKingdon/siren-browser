@@ -37,11 +37,32 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
     }
 
     private generateHtml(): void {
+        const generalStylesPath = vscode.Uri.joinPath(
+            this._extensionUri,
+            'src',
+            'styles',
+            'styles.general.css'
+        );
+        const treeStylesPath = vscode.Uri.joinPath(
+            this._extensionUri,
+            'src',
+            'styles',
+            'styles.tree.css'
+        );
+
+        const treeStylesUri = this.view?.webview.asWebviewUri(treeStylesPath);
+        const generalStylesUri = this.view?.webview.asWebviewUri(generalStylesPath);
+
         if (this.view) {
             this.view.webview.html = `
-                <html>
-                    <body>
-                        <button>New Request</button>
+                <html style="height: 96%;">
+                    <link href=${treeStylesUri} rel="stylesheet" />
+                    <link href=${generalStylesUri} rel="stylesheet" />
+                    <body style="height: 96%;">
+                        <div id='tree-control-container'>
+                            <button id='tree-new-request' class='siren-browser-button'>New Request</button>
+                        </div>
+                        <h3>History</h3>
                         <div id="tree-container"></div>
                         <script>${this.generateHtmlEvents()}</script>
                     </body>
@@ -54,7 +75,7 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
         return /*javascript*/`
             const vscode = acquireVsCodeApi();
             const container = document.getElementById('tree-container');
-            const newBtn = document.querySelector('button')
+            const newBtn = document.querySelector('#tree-new-request')
 
             newBtn.addEventListener('click', e => {
                 vscode.postMessage(${

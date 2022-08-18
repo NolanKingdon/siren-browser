@@ -1,0 +1,32 @@
+.flex-row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;    
+}
+
+/* Buttons */
+.siren-browser-button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    padding: 0.5em;
+}
+
+.siren-browser-button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+    cursor: pointer;
+}
+
+.siren-browser-icon-button {
+    background-color: transparent;
+    border: none;
+    color: var(--vscode-button-foreground);
+    height: 20px;
+    width: 20px;
+
+    margin: auto 0;
+    padding: 0;
+}
+.siren-browser-icon-button:hover {
+    cursor: pointer;
+}

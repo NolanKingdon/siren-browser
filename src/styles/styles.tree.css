@@ -1,0 +1,28 @@
+/* Button && Button Container */
+#tree-control-container {
+    padding: 1em 1em 2em 1em;
+    border-bottom: 1px solid var(--vscode-textBlockQuote-background);
+    margin-bottom: 1em;
+}
+
+#tree-new-request {
+    width: 100%;
+}
+
+/* Main Container */
+#tree-container {
+    height: 100%;
+    overflow-x: auto;
+}
+
+/* Tree Nodes */
+.siren-tree-node {
+    border-left: 1px solid var(--vscode-focusBorder);
+    padding-left: 1em;
+    margin: 0;
+}
+
+.siren-tree-node p:hover {
+    background-color: var(--vscode-textBlockQuote-background);
+    cursor: pointer;
+}

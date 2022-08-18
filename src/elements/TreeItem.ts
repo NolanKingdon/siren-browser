@@ -35,16 +35,31 @@ export class TreeItem implements Renderable {
 
     public render(): string { // TODO - pull CSS into seperate file
         return `
-            <div class='siren-tree-node' style="border-left: 1px solid cyan; padding: 0.25em 0 0 1em; margin: 0;">
-                <p onclick='(function() {
-                    vscode.postMessage(
-                        ${new Event(
-                            EventType.treeLinkClicked,
-                            this._href
-                        ).toHtml()}
-                    );
-                    })()'>${this._href}</p>
-                </p>
+            <div class='siren-tree-node'>
+                <div class='flex-row-space-between'>
+                    <p onclick='(() => {
+                        vscode.postMessage(
+                            ${new Event(
+                                EventType.treeLinkClicked,
+                                this._href
+                            ).toHtml()}
+                        );
+                        })()'>${this._href}</p>
+                    </p>
+                    <button 
+                        class='siren-browser-icon-button'
+                        onclick='(() => { 
+                            vscode.postMessage(
+                                ${
+                                    new Event(
+                                        EventType.treeLinkRemoved,
+                                        this._href
+                                    ).toHtml()
+                                }
+                            )
+                        })()'
+                    >X</button>
+                </div>
                 ${ this._children ? this._children.map( child => child.render() ).join('') : ``}
             </div>
         `;
