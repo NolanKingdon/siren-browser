@@ -56,7 +56,7 @@ class SirenBrowser {
 
             switch (e.type){
                 case EventType.treeLinkClicked:
-                    await this.fetchAndUpdateContent(e.content);
+                    await this.tryFetchAndUpdateContent(e.content);
                     break;
                 case EventType.treeLinkRemoved:
                     break;
@@ -98,7 +98,7 @@ class SirenBrowser {
                     const unchangedHref = e.content.href;
                     
                     // Reload once the new token is assigned
-                    await this.fetchAndUpdateContent(unchangedHref);
+                    await this.tryFetchAndUpdateContent(unchangedHref);
 
                     break;
                 case EventType.contentHrefUpdate:
@@ -107,26 +107,25 @@ class SirenBrowser {
                     //      nav off the actionBar, it sticks around.
                     //      Preferably when you close/re-open vscode
                     const href = e.content.href;
+                    if (await this.tryFetchAndUpdateContent(href)) {
 
-                    console.log(e.content);
-                    const parent = this.getTreeItemByHref(e.content.parent);
+                        const parent = this.getTreeItemByHref(e.content.parent);
 
-                    if (parent) {
-                        parent.addChild(e.content.href);
-                    } else {
-                        this._treeItems.push(new TreeItem(href));
+                        if (parent) {
+                            parent.addChild(e.content.href);
+                        } else {
+                            this._treeItems.push(new TreeItem(href));
+                        }
+
+                        const html = this.renderAllTreeLinks();
+
+                        this._treeView.sendEvent(
+                            new Event(
+                                EventType.treeLinkAdded,
+                                html
+                            )
+                        );
                     }
-
-                    const html = this.renderAllTreeLinks();
-
-                    this._treeView.sendEvent(
-                        new Event(
-                            EventType.treeLinkAdded,
-                            html
-                        )
-                    );
-                    
-                    await this.fetchAndUpdateContent(href);
 
                     break;
                 case EventType.contentUpdated:
@@ -172,7 +171,7 @@ class SirenBrowser {
         return result;
     }
 
-    private async fetchAndUpdateContent(href: string): Promise<void> {
+    private async tryFetchAndUpdateContent(href: string): Promise<boolean> {
         const options = this._authToken 
             ? { 
                 headers: {
@@ -181,9 +180,25 @@ class SirenBrowser {
              } 
             : {};
         const res: any = await fetch(href, options)
-            .then(res => res.json())
-            .catch(e => console.log(e));
+            .then(res => {
+                if(res.ok) {
+                    return res.json();
+                } else {
+                    throw new Error(`Erorr encountered during request: ${res.status} ${res.statusText}`);
+                }
+            })
+            .catch(e => {
+                vscode.window.showErrorMessage(
+                    e.message
+                );
+
+                return e;
+            });
         
+        if(res instanceof Error) {
+            return false;
+        }
+
         const entity = new SirenEntity(res);
 
         this._contentView?.sendEvent(
@@ -196,6 +211,8 @@ class SirenBrowser {
                 )
             )
         );
+
+        return true;
     }
 }
 
