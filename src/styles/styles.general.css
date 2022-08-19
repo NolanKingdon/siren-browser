@@ -30,3 +30,26 @@
 .siren-browser-icon-button:hover {
     cursor: pointer;
 }
+
+/* Inputs */
+.siren-input {
+    background-color: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border);
+    color: var(--vscode-input-foreground);
+    padding: 0.5em;
+}
+
+.siren-input::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+}
+
+.siren-input:hover {
+    background-color: var(--vscode-inputOption-hoverBackground);
+    color: var(--vscode-inputOption-hoverForeground);
+    border: 1px solid var(--vscode-inputOption-hoverBorder);
+}
+
+.siren-input:active {
+    background-color: var(--vscode-inputOption-activeBackground);
+    color: var(--vscode-inputOption-activeForeground);
+}
