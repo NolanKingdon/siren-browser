@@ -10,18 +10,14 @@ export function activate(context: vscode.ExtensionContext) {
 	// - Documentation
 	// - Save state so we don't have to reload everything every time we click
 	// - Styles 
-	//		- CSS
 	//		- Better Icon
 	// - Actual Tree
 	//		- Specific styles for highlighted node
 	//		- Delete nodes
 	//		- Short URL display
 	// - Content View
-	//		- Inputs need to work
 	//		- Ensure all possible information is represented
 	// - Deactivate functions?
-	// - Error Handling (Bad requests, events, etc.)
-	//		- If we 401, we need to be shown that upfront and loudly
 	// - Named content pages (Display in tree)
 
 	// TODO - known bugs
