@@ -6,12 +6,12 @@ import WebviewGenerator from "./WebviewGenerator";
 export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider {
 	
 	public view?: vscode.WebviewView;
+    public readonly extensionUri: vscode.Uri;
 	public static readonly viewType = 'sirenBrowser.requestTree';
-    private readonly _extensionUri: vscode.Uri;
     private readonly _eventCallback: (view: vscode.Webview) => void;
 
 	constructor(extensionUri: vscode.Uri, eventCallback: (view: vscode.Webview) => void) {
-        this._extensionUri = extensionUri;
+        this.extensionUri = extensionUri;
         this._eventCallback = eventCallback;
     }
 
@@ -23,7 +23,7 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 		webviewView.webview.options = {
 			enableScripts: true,
 			localResourceRoots: [
-				this._extensionUri
+				this.extensionUri
 			]
 		};
 
@@ -38,13 +38,13 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 
     private generateHtml(): void {
         const generalStylesPath = vscode.Uri.joinPath(
-            this._extensionUri,
+            this.extensionUri,
             'src',
             'styles',
             'styles.general.css'
         );
         const treeStylesPath = vscode.Uri.joinPath(
-            this._extensionUri,
+            this.extensionUri,
             'src',
             'styles',
             'styles.tree.css'

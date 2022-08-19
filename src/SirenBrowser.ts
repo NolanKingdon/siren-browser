@@ -10,7 +10,7 @@ import { SirenEntity } from './elements/SirenElements';
 class SirenBrowser {
     private _authToken: string;
     private _context: vscode.ExtensionContext;
-    private _treeView?: TreeWebView;
+    private _treeView: TreeWebView;
     private _contentView?: ContentWebView;
     private _treeItems: TreeItem[];
 
@@ -119,7 +119,7 @@ class SirenBrowser {
 
                     const html = this.renderAllTreeLinks();
 
-                    this._treeView?.sendEvent(
+                    this._treeView.sendEvent(
                         new Event(
                             EventType.treeLinkAdded,
                             html
@@ -151,7 +151,7 @@ class SirenBrowser {
     }
 
     private createContentView(): ContentWebView {
-        const view = new ContentWebView();
+        const view = new ContentWebView(this._treeView.extensionUri);
 
         view.panel.onDidDispose(() => {
             view.disposed = true;
