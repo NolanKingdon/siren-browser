@@ -19,7 +19,7 @@
         {
           "id": "sirenBrowser",
           "title": "Siren Browser",
-          "icon": "$(eye)"
+          "icon": "siren-icon.svg"
         }
       ]
     },
