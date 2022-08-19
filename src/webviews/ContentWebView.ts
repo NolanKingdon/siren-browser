@@ -7,8 +7,9 @@ export class ContentWebView implements WebviewGenerator {
     
     public panel: vscode.WebviewPanel;
     public disposed: boolean = false;
+    private extensionUri: vscode.Uri;
 
-    constructor() {
+    constructor(extensionUri: vscode.Uri) {
         this.panel = vscode.window.createWebviewPanel(
             'sirenContent',
             'Siren Browser',
@@ -17,6 +18,7 @@ export class ContentWebView implements WebviewGenerator {
                 enableScripts: true
             }
         );
+        this.extensionUri = extensionUri; 
         
         this.generateHtml();
     }
@@ -26,13 +28,32 @@ export class ContentWebView implements WebviewGenerator {
     }
 
     private generateHtml(): void {
+        const generalStylesPath = vscode.Uri.joinPath(
+            this.extensionUri,
+            'src',
+            'styles',
+            'styles.general.css'
+        );
+        const contentStylesPath = vscode.Uri.joinPath(
+            this.extensionUri,
+            'src',
+            'styles',
+            'styles.content.css'
+        );
+        const generalStylesUri = this.panel.webview.asWebviewUri(generalStylesPath);
+        const contentStylesUri = this.panel.webview.asWebviewUri(contentStylesPath);
+
         this.panel.webview.html = `
             <html>
+                <head>
+                    <link href=${generalStylesUri} rel='stylesheet' />
+                    <link href=${contentStylesUri} rel='stylesheet' />
+                </head>
                 <body>
                     <div id='content-inputs'>
-                        <input id='content-href' type='text' placeholder='Href' />
-                        <input id='content-token' type='text' placeholder='Token' />
-                        <button>Go</button>
+                        <input id='content-href' class='siren-input' type='text' placeholder='Href' />
+                        <input id='content-token' class='siren-input' type='text' placeholder='Token' />
+                        <button id='content-button' class="siren-browser-button">GET</button>
                     </div>
                     <div id='content-container'></div>
                     <script>${this.generateHtmlEvents()}</script>

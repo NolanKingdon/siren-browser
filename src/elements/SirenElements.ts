@@ -74,9 +74,11 @@ export class SirenEntity extends SirenBase implements Renderable {
 
     private renderBaseEntity(): string {
         return `
-            <div class='siren-entity'>
-                <h1>Class</h1>
-                <p>[ ${this.class.map( c => ` ${c}`)} ] </p>
+            <div class='content-sub-container'>
+                <h2>Class</h2>
+                <div class='content-indented'>
+                    <p>[ ${this.class.map( c => ` ${c}`)} ] </p>
+                </div>
             </div>
             ${this.renderEntityContents()}
         `;
@@ -84,10 +86,12 @@ export class SirenEntity extends SirenBase implements Renderable {
 
     private renderSubEntity(): string {
         return `
-            <div class='siren-sub-entity'>
+            <div class='content-sub-entity-container'>
                 <h3>Sub Class</h3>
-                <p>[ ${this.class.map( c => ` ${c}`)}]</p>
-                ${this.renderEntityContents()}
+                <div class='content-indented'>
+                    <p>[ ${this.class.map( c => ` ${c}`)} ]</p>
+                    ${this.renderEntityContents()}
+                </div>
             </div>
         `;
     }
@@ -95,11 +99,25 @@ export class SirenEntity extends SirenBase implements Renderable {
     private renderEntityContents(): string {
         return `
             ${
+                this.links.length !== 0 
+                ? `
+                    <div class='content-sub-container'>
+                        <h2>Links</h2>
+                        <div class='content-indented'>
+                            ${this.links.map( link => link.render(self)).join('')}
+                        </div>
+                    </div>
+                ` 
+                : ``
+            }
+            ${
                 this.actions.length !== 0 
                 ? `
-                        <div class='siren-actions'>
+                        <div class='content-sub-container'>
                             <h2>Actions</h2>
-                            ${this.actions.map( action => action.render())}
+                            <div class='content-indented'>
+                                ${this.actions.map( action => action.render()).join('')}
+                            </div>
                         </div>
                 `
                 : ``
@@ -107,17 +125,37 @@ export class SirenEntity extends SirenBase implements Renderable {
             ${
                 this.entities.length !== 0 
                     ? `
-                        <h2>Sub Entities</h2>
-                        ${this.entities.map( entity => entity.render())}
+                        <div class='content-sub-container'>
+                            <h2>Sub Entities</h2>
+                            ${this.entities.map( entity => entity.render()).join('')}
+                        </div>
                     `
                     : ``}
             ${
-                this.links.length !== 0 
-                ? `
-                    <h2>Links</h2>
-                    ${this.links.map( link => link.render(self))}
-                ` : ``}
-            ${Object.keys(this.properties).map( prop => `<p>${prop} -> ${this.properties[prop]}</p>`)}
+                this.properties.length !== 0
+                    ? `
+                        <div class='content-sub-container'>
+                            <h2>Properties</h2>
+                            <table class='content-table'>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                            ${
+                                Object.keys(this.properties)
+                                    .map(prop => `
+                                        <tr>
+                                            <td>${prop}</td> 
+                                            <td>${this.properties[prop]}</td>
+                                        </tr>
+                                    `)
+                                    .join('')
+                            }
+                            </table>
+                        </div>
+                    `
+                    : ``
+            }
         `;
     }
 }
@@ -137,11 +175,11 @@ export class SirenLink extends SirenBase implements Renderable {
 
     public render(parent?: string): string {
         return `
-            <p>Rel: [ ${
-                this.rel.map( // TODO -> Pull styles into css file
+            <p>[ ${
+                this.rel.map(
                     r => `
                         <span 
-                            style='color: cyan; text-decoration: underline;'
+                            class='content-rel-link'
                             onclick='(function(){
                                 vscode.postMessage(${
                                     new Event(
@@ -184,18 +222,36 @@ export class SirenAction extends SirenBase implements Renderable {
     public render(): string {
         // TODO -> Following these
         return `
-            <h3>${this.name}${this.method ? ` - ${this.method}` : ``}</h3>
-            <h4>${this.href}</h4>
             ${ 
                 this.fields.length !== 0
                     ? `
-                        ${this.fields.map( field => `
-                            <label>${field.name}<input type=${field.type} value=${field.value} /></label>
-                        `)}
+                        <h3>${this.name}${this.method ? ` - ${this.method}` : ``}</h3>
+                        <table class='content-table'>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                            ${this.fields.map( field => `
+                                <tr>
+                                    <td>${field.name}</td>
+                                    <td>
+                                        <input
+                                            id='${this.name}-${this.method}-${field.name}' 
+                                            class='siren-input'
+                                            type='text'
+                                            value=${field.value} 
+                                        />
+                                </tr>
+                            `).join('')}
+                            <tr>
+                                <td colspan="100%">
+                                    <button style="width: 100%" class='siren-browser-button'>Submit</button>
+                                </td>
+                            </tr>
+                        </table>
                     `
                     : ``
             }
-            <button>Submit</button>
         `;
     }
 }

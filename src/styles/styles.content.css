@@ -1,0 +1,80 @@
+/* Top Inputs */
+#content-inputs {
+    padding: 1em;
+    width: 100%;
+    border-bottom: 1px solid var(--vscode-textBlockQuote-background);
+    display: flex;
+}
+
+#content-inputs * {
+    margin: 0 1px;
+}
+
+#content-href {
+    flex-grow: 8;
+}
+
+#content-token {
+    flex-grow: 2;
+}
+
+#content-button {
+    flex-grow: 1;
+}
+
+/* Content Container */
+.content-sub-container {
+    padding: 1em;
+    margin: 0
+}
+
+.content-sub-container:nth-child(even) {
+    background-color: var(--vscode-textBlockQuote-background);
+}
+
+.content-sub-container:nth-child(odd) {
+    background-color: var(--vscode-activityBar-background);
+}
+
+.content-sub-entity-container .content-sub-container {
+    background-color: transparent;
+}
+
+.content-sub-entity-container {
+    padding: 0.5em 2.3em;
+    margin-left: 3.2em;
+    border-left: 0.5px solid var(--vscode-focusBorder);
+}
+
+.content-sub-entity-container .content-sub-container {
+    border-left: 0.5px solid var(--vscode-focusBorder);
+    margin-left: 1em;
+}
+
+.content-sub-entity-container .content-sub-container h2 {
+    font-size: 1.2em;
+}
+
+/* Other */
+.content-rel-link {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: underline;
+}
+
+.content-rel-link:hover {
+    cursor: pointer;
+}
+
+.content-indented {
+    margin-left: 1em;
+}
+
+/* Table */
+.content-table {
+    margin: 0 1em;
+}
+
+.content-table tr * {
+    text-align: left;
+    padding: 0.5em 1em;
+}
