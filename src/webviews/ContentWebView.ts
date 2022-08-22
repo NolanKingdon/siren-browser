@@ -15,7 +15,8 @@ export class ContentWebView implements WebviewGenerator {
             'Siren Browser',
             vscode.ViewColumn.One,
             {
-                enableScripts: true
+                enableScripts: true,
+                retainContextWhenHidden: true
             }
         );
         this.extensionUri = extensionUri; 
