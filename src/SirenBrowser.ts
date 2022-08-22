@@ -74,7 +74,6 @@ class SirenBrowser {
      */
     private generateTreeEvents(_this: SirenBrowser, view: vscode.WebviewView) {
         view.onDidChangeVisibility(e => {
-            console.log('Vis Changed');
             if(view.visible) {
                 // Load everything again.
                 _this.generateTreeStateFromContext();
