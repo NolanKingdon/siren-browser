@@ -101,6 +101,24 @@ class SirenBrowser {
                     await this.tryFetchAndUpdateContent(e.content);
                     break;
                 case EventType.treeLinkRemoved:
+                    for(let i=0; i<this._treeItems.length; i++) {
+                        if(this._treeItems[i].isNode(e.content)) {
+                            this._treeItems.splice(i, 1);
+                            break;
+                        } else if(this._treeItems[i].deleteChild(e.content)){
+                            break;
+                        }
+                    }
+
+                    this._context.workspaceState.update(this._treeWorkspaceState, this._treeItems);
+
+                    this._treeView?.sendEvent(
+                        new Event(
+                            EventType.treeLinkAdded,
+                            this.renderAllTreeLinks()
+                        )
+                    );
+
                     break;
                 case EventType.treeNewRequest:
                     if(!_this._contentView || _this._contentView.disposed) {
@@ -169,8 +187,6 @@ class SirenBrowser {
                         );
                     }
 
-                    break;
-                case EventType.contentUpdated:
                     break;
                 default:
                     break;

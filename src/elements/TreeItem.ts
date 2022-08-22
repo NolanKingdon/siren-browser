@@ -21,8 +21,27 @@ export class TreeItem implements Renderable {
         this._children = children;
     }
 
+    public deleteChild(href: string): boolean {
+        for (let i = 0; i < this._children.length; i++) {
+            if(this._children[i].isNode(href)) {
+                this._children.splice(i,1);
+                return true;
+            } 
+
+            if(this._children[i].deleteChild(href)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public isNode(href: string): boolean {
+        return this._href === href;
+    }
+
     public getNodeByHref(href: string): TreeItem | null {
-        if(this._href === href) {
+        if(this.isNode(href)) {
             return this;
         }
 
@@ -41,7 +60,7 @@ export class TreeItem implements Renderable {
         return `
             <div class='siren-tree-node'>
                 <div class='flex-row-space-between'>
-                    <p onclick='(() => {
+                    <p class='siren-tree-node-text' onclick='(() => {
                         vscode.postMessage(
                             ${new Event(
                                 EventType.treeLinkClicked,

@@ -26,3 +26,7 @@
     background-color: var(--vscode-textBlockQuote-background);
     cursor: pointer;
 }
+
+.siren-tree-node-text {
+    min-width: 50%;
+}
