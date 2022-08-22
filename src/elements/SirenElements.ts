@@ -41,9 +41,11 @@ export class SirenBase {
     }
 
     private getSelf(json: any): string {
-        for(let link of json.links) {
-            if(link.rel.includes('self')) {
-                return link.href;
+        if(json.links && json.links.length > 0) {
+            for(let link of json.links) {
+                if(link.rel.includes('self')) {
+                    return link.href;
+                }
             }
         }
 
