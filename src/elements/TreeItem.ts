@@ -17,6 +17,10 @@ export class TreeItem implements Renderable {
         this._children.push(new TreeItem(href, false));
     }
 
+    public setChildren(children: TreeItem[]) {
+        this._children = children;
+    }
+
     public getNodeByHref(href: string): TreeItem | null {
         if(this._href === href) {
             return this;
@@ -33,7 +37,7 @@ export class TreeItem implements Renderable {
         return null;
     }
 
-    public render(): string { // TODO - pull CSS into seperate file
+    public render(): string { 
         return `
             <div class='siren-tree-node'>
                 <div class='flex-row-space-between'>

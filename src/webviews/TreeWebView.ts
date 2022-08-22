@@ -8,11 +8,17 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 	public view?: vscode.WebviewView;
     public readonly extensionUri: vscode.Uri;
 	public static readonly viewType = 'sirenBrowser.requestTree';
-    private readonly _eventCallback: (view: vscode.Webview) => void;
+    private readonly _eventCallback: (view: vscode.WebviewView) => void;
+    private readonly _initialState: string;
 
-	constructor(extensionUri: vscode.Uri, eventCallback: (view: vscode.Webview) => void) {
+	constructor(
+        extensionUri: vscode.Uri, 
+        eventCallback: (view: vscode.WebviewView) => void,
+        initialState: string = ''
+    ) {
         this.extensionUri = extensionUri;
         this._eventCallback = eventCallback;
+        this._initialState = initialState;
     }
 
 	resolveWebviewView(
@@ -26,10 +32,20 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
 				this.extensionUri
 			]
 		};
-
+        
 		this.view = webviewView;
         this.generateHtml();
-        this._eventCallback(this.view.webview);
+        this._eventCallback(this.view);
+
+        if(this._initialState.length !== 0) {
+            this.sendEvent(
+                new Event(
+                    EventType.treeLinkAdded,
+                    this._initialState
+                )
+            );
+        }
+
 	}
 
     sendEvent(event: Event) {

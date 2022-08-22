@@ -8,6 +8,8 @@ import { TreeItem } from './elements/TreeItem';
 import { SirenEntity } from './elements/SirenElements';
 
 class SirenBrowser {
+    private readonly _treeWorkspaceState: string = 'siren-browser_tree-state';
+    private readonly _contentWorkspaceState: string = 'siren-browser_content-state';
     private _authToken: string;
     private _context: vscode.ExtensionContext;
     private _treeView: TreeWebView;
@@ -16,21 +18,46 @@ class SirenBrowser {
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
+        this._treeItems = this.generateTreeStateFromContext();
         this._treeView = this.generateTreeProvider();
         this._authToken = '';
-        this._treeItems = [];
     }
 
     deactivate() {
         // TODO
     }
 
+    private generateTreeStateFromContext(): TreeItem[] { 
+        const state = this._context.workspaceState.get(this._treeWorkspaceState) as any[];
+        const result: TreeItem[] = [];
+        
+        state.forEach(item => result.push(this.generatePreviousTreeState(item)));
+
+        return result;
+    }
+
+    private generatePreviousTreeState(item: {_href: string, _children: any[], _isRoot: boolean}): TreeItem {
+        const treeItem = new TreeItem(item._href, item._isRoot);
+
+        if(item._children) {
+            const children: TreeItem[] = [];
+
+            item._children.forEach( child => children.push(this.generatePreviousTreeState(child)) );
+
+            treeItem.setChildren(children);
+        }
+
+        return treeItem;
+    }
+
     private generateTreeProvider(): TreeWebView {
         const _this: SirenBrowser = this; // Keep parent context
         const treeProvider = new TreeWebView(
             this._context.extensionUri,
-            (view: vscode.Webview) => _this.generateTreeEvents(_this, view)
+            (view: vscode.WebviewView) => _this.generateTreeEvents(_this, view),
+            this.renderAllTreeLinks()
         );
+
         this._context.subscriptions.push(
             vscode.window.registerWebviewViewProvider(
                 TreeWebView.viewType,
@@ -45,8 +72,23 @@ class SirenBrowser {
      * Callback for TreeWebView to call when resolveWebviewView is called.
      * @param _this context of SirenBrowser to modify state when used as callback
      */
-    private generateTreeEvents(_this: SirenBrowser, view: vscode.Webview) {
-        view.onDidReceiveMessage(async (e: any) => {
+    private generateTreeEvents(_this: SirenBrowser, view: vscode.WebviewView) {
+        view.onDidChangeVisibility(e => {
+            console.log('Vis Changed');
+            if(view.visible) {
+                // Load everything again.
+                _this.generateTreeStateFromContext();
+
+                _this._treeView.sendEvent(
+                    new Event(
+                        EventType.treeLinkAdded,
+                        _this.renderAllTreeLinks()
+                    )
+                );
+            }
+        });
+
+        view.webview.onDidReceiveMessage(async (e: any) => {
             vscode.window.showInformationMessage(
                 `Event recieved for TreeWebView. 
                     Type: ${EventType[e.type]}
@@ -103,9 +145,6 @@ class SirenBrowser {
                     break;
                 case EventType.contentHrefUpdate:
                 case EventType.contentLinkClicked:
-                    // TODO - some way to hold this in state so when we
-                    //      nav off the actionBar, it sticks around.
-                    //      Preferably when you close/re-open vscode
                     const href = e.content.href;
                     if (await this.tryFetchAndUpdateContent(href)) {
 
@@ -116,6 +155,9 @@ class SirenBrowser {
                         } else {
                             this._treeItems.push(new TreeItem(href));
                         }
+                        
+                        // For when we re-load things
+                        this._context.workspaceState.update(this._treeWorkspaceState, this._treeItems);
 
                         const html = this.renderAllTreeLinks();
 
