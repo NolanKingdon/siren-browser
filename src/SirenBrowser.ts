@@ -15,12 +15,15 @@ class SirenBrowser {
     private _treeView: TreeWebView;
     private _contentView?: ContentWebView;
     private _treeItems: TreeItem[];
+    private _currentEntity?: SirenEntity;
+    private _raw: boolean;
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
         this._treeItems = this.generateTreeStateFromContext();
         this._treeView = this.generateTreeProvider();
         this._authToken = '';
+        this._raw = false;
     }
 
     deactivate() {
@@ -187,6 +190,10 @@ class SirenBrowser {
                     }
 
                     break;
+                case EventType.contentRawToggle:
+                    this._raw = e.content.checked as boolean;
+                    this.updateContent(e.content.href);
+                    break;
                 default:
                     break;
             }
@@ -256,7 +263,18 @@ class SirenBrowser {
             return false;
         }
 
-        const entity = new SirenEntity(res);
+        // Store entity globally so we can just convert to JSON with a raw switch.
+        this._currentEntity = new SirenEntity(res);
+
+        this.updateContent(href);
+
+        return true;
+    }
+
+    private updateContent(href: string): void {
+        if(!this._currentEntity) {
+            return;
+        }
 
         this._contentView?.sendEvent(
             new Event(
@@ -264,12 +282,12 @@ class SirenBrowser {
                 new ContentUpdate(
                     href,
                     '',
-                    entity.render()
+                    this._raw 
+                        ? this._currentEntity.getRaw() 
+                        : this._currentEntity.render()
                 )
             )
         );
-
-        return true;
     }
 }
 

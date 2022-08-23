@@ -4,6 +4,7 @@ export enum EventType {
     contentLinkClicked,
     contentHrefUpdate,
     contentTokenUpdate,
+    contentRawToggle,
 
     // Tree Events
     treeLinkAdded,

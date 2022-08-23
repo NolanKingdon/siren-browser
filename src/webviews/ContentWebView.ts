@@ -55,6 +55,7 @@ export class ContentWebView implements WebviewGenerator {
                         <input id='content-href' class='siren-input' type='text' placeholder='Href' />
                         <input id='content-token' class='siren-input' type='text' placeholder='Token' />
                         <button id='content-button' class="siren-browser-button">GET</button>
+                        <input id='content-raw' type='checkbox' /><label class='siren-input-label'>Raw</label>
                     </div>
                     <div id='content-container'></div>
                     <script>${this.generateHtmlEvents()}</script>
@@ -70,6 +71,7 @@ export class ContentWebView implements WebviewGenerator {
             const submit = document.querySelector('#content-inputs button');
             const token = document.querySelector('#content-token');
             const href = document.querySelector('#content-href');
+            const raw = document.querySelector('#content-raw');
             let originalToken = '';
             let parentHref = '';
 
@@ -96,6 +98,16 @@ export class ContentWebView implements WebviewGenerator {
                         }
                     });
                 }
+            });
+
+            raw.addEventListener('click', () => {
+                vscode.postMessage({
+                    type: ${EventType.contentRawToggle},
+                    content: {
+                        checked: raw.checked,
+                        href: href.value
+                    }
+                });
             });
 
             window.addEventListener('message', event => {

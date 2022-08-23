@@ -59,12 +59,12 @@ export class SirenEntity extends SirenBase implements Renderable {
 
     constructor(json: any, isSubEntity: boolean = false) {
         super(json, !isSubEntity);
-        this.json = JSON.stringify(json);
+        this.json = JSON.stringify(json, null, 2);
         this.isSubEntity = isSubEntity;
     }
 
     public getRaw() {
-        return this.json;
+        return `<pre>${this.json}</pre>`;
     }
 
     public render(): string {
