@@ -58,6 +58,7 @@
     height: 1em;
 }
 
+/* https://www.html5canvastutorials.com/blog/2012/06/custom-form-radio-checkbox/ */
 input[type=checkbox] {
     -webkit-appearance: none;
 	background-color: var(--vscode-checkbox-background);
