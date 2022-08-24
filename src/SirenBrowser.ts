@@ -274,6 +274,17 @@ class SirenBrowser {
             }
         }
 
+        this._contentView?.sendEvent(
+            new Event(
+                EventType.contentUpdated,
+                new ContentUpdate(
+                    href,
+                    '',
+                    `<h1 style='width: 100%; text-align: center;'>Loading...</h1>`
+                )
+            )
+        );
+
         const res: any = await fetch(href, options)
             .then(res => {
                 if(res.ok) {
@@ -283,6 +294,17 @@ class SirenBrowser {
                 }
             })
             .catch(e => {
+                this._contentView?.sendEvent(
+                    new Event(
+                        EventType.contentUpdated,
+                        new ContentUpdate(
+                            href,
+                            '',
+                            `<h1>Error</h1><p>${e.message}</p>`
+                        )
+                    )
+                );
+
                 vscode.window.showErrorMessage(
                     e.message
                 );
