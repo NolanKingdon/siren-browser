@@ -30,3 +30,8 @@
 .siren-tree-node-text {
     min-width: 50%;
 }
+
+/* Second selector removes normal hover behaviour from above */
+.active-tree-node, .siren-tree-node .active-tree-node:hover {
+    background-color: var(--vscode-textBlockQuote-border);
+}

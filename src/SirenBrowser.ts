@@ -17,6 +17,7 @@ class SirenBrowser {
     private _treeItems: TreeItem[];
     private _currentEntity?: SirenEntity;
     private _raw: boolean;
+    private _activeTreeNode?: TreeItem;
 
     constructor(context: vscode.ExtensionContext) {
         this._context = context;
@@ -39,8 +40,8 @@ class SirenBrowser {
         return result;
     }
 
-    private generatePreviousTreeState(item: {_href: string, _children: any[], _isRoot: boolean}): TreeItem {
-        const treeItem = new TreeItem(item._href, item._isRoot);
+    private generatePreviousTreeState(item: {_href: string, _children: any[]}): TreeItem {
+        const treeItem = new TreeItem(item._href);
 
         if(item._children) {
             const children: TreeItem[] = [];
@@ -100,7 +101,25 @@ class SirenBrowser {
 
             switch (e.type){
                 case EventType.treeLinkClicked:
-                    await this.tryFetchAndUpdateContent(e.content, 'GET');
+                    if(await this.tryFetchAndUpdateContent(e.content, 'GET')){
+                        if(this._activeTreeNode) {
+                            this._activeTreeNode.isActive = false;
+                        }
+
+                        const existing = this.getTreeItemByHref(e.content);
+
+                        if (existing) {
+                            this._activeTreeNode = existing;
+                            this._activeTreeNode.isActive = true;
+                        }
+
+                        this._treeView.sendEvent(
+                            new Event(
+                                EventType.treeLinkAdded,
+                                this.renderAllTreeLinks()
+                            )
+                        );
+                    }
                     break;
                 case EventType.treeLinkRemoved:
                     for(let i=0; i<this._treeItems.length; i++) {
@@ -168,13 +187,31 @@ class SirenBrowser {
                 case EventType.contentHrefUpdate:
                 case EventType.contentLinkClicked:
                     if (await this.tryFetchAndUpdateContent(href, 'GET')) {
-
+                        // NOTE - this may cause issues if the same route appears in two branches.
+                        const existingNode = this.getTreeItemByHref(href);
                         const parent = this.getTreeItemByHref(e.content.parent);
 
-                        if (parent) {
-                            parent.addChild(e.content.href);
+                        if(this._activeTreeNode) {
+                            this._activeTreeNode.isActive = false;
+                        }
+
+                        // If the node we're trying to add already exists in our tree
+                        if(existingNode) {
+                            existingNode.isActive = true;
+                            this._activeTreeNode = existingNode;
+                        // Not en existing node, but the parent does exist.
+                        } else if(parent) {
+                            // If the parent is not the new node
+                            if(!parent.isNode(href)) {
+                                // This auto-activates.
+                                this._activeTreeNode = parent.addChild(href);
+                            }
+                        // The href doesn't exist, and it doesn't have a parent
                         } else {
-                            this._treeItems.push(new TreeItem(href));
+                            const newNode = new TreeItem(href);
+                            newNode.isActive = true;
+                            this._activeTreeNode = newNode;
+                            this._treeItems.push(newNode);
                         }
                         
                         // For when we re-load things
@@ -218,6 +255,10 @@ class SirenBrowser {
 
     private getTreeItemByHref(href: string): TreeItem | null {
         for(let item of this._treeItems) {
+            if (item.isNode(href)) {
+                return item;
+            }
+
             const node = item.getNodeByHref(href);
 
             if(node) {

@@ -5,16 +5,20 @@ import { Renderable } from "./Renderable";
 export class TreeItem implements Renderable {
     private _href: string;
     private _children: TreeItem[];
-    private _isRoot: boolean;
+    public isActive: boolean;
 
-    constructor(href: string, isRoot: boolean = true) {
+    constructor(href: string, isActive: boolean = false) {
         this._href = href;
         this._children = [];
-        this._isRoot = isRoot;
+        this.isActive = isActive;
     }
 
-    public addChild(href: string): void {
-        this._children.push(new TreeItem(href, false));
+    public addChild(href: string): TreeItem {
+        const newTree = new TreeItem(href);
+        newTree.isActive = true;
+        this._children.push(newTree);
+
+        return newTree;
     }
 
     public setChildren(children: TreeItem[]) {
@@ -67,7 +71,7 @@ export class TreeItem implements Renderable {
 
         return `
             <div class='siren-tree-node'>
-                <div title='${this._href}' class='flex-row-space-between'>
+                <div title='${this._href}' class='flex-row-space-between${this.isActive ? ' active-tree-node' : ''}'>
                     <p class='siren-tree-node-text' onclick='(() => {
                         vscode.postMessage(
                             ${new Event(
