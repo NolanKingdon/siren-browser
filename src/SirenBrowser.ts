@@ -34,7 +34,7 @@ class SirenBrowser {
         const state = this._context.workspaceState.get(this._treeWorkspaceState) as any[];
         const result: TreeItem[] = [];
         
-        state.forEach(item => result.push(this.generatePreviousTreeState(item)));
+        state?.forEach(item => result.push(this.generatePreviousTreeState(item)));
 
         return result;
     }
