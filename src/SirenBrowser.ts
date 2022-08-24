@@ -92,12 +92,14 @@ class SirenBrowser {
         });
 
         view.webview.onDidReceiveMessage(async (e: any) => {
-            vscode.window.showInformationMessage(
-                `Event recieved for TreeWebView. 
-                    Type: ${EventType[e.type]}
-                    Content: ${e.content}
-                `
-            );
+            if(process.env.DEVELOPMENT) {
+                vscode.window.showInformationMessage(
+                    `Event recieved for TreeWebView. 
+                        Type: ${EventType[e.type]}
+                        Content: ${e.content}
+                    `
+                );
+            }
 
             switch (e.type){
                 case EventType.treeLinkClicked:
@@ -174,12 +176,14 @@ class SirenBrowser {
 
     private generateContentViewEvents(view: ContentWebView) {
         view.panel.webview.onDidReceiveMessage(async (e: any) => {
-            vscode.window.showInformationMessage(
-                `Event recieved for ContentWebView. 
-                    Type: ${EventType[e.type]}
-                    Content: ${e.content}
-                `
-            );
+            if(process.env.DEVELOPMENT) {
+                vscode.window.showInformationMessage(
+                    `Event recieved for ContentWebView. 
+                        Type: ${EventType[e.type]}
+                        Content: ${e.content}
+                    `
+                );
+            }
 
             const href = e.content.href;
 
