@@ -57,9 +57,17 @@ export class TreeItem implements Renderable {
     }
 
     public render(): string { 
+        const split: string[] = this._href.split('/');
+        let href = this._href;
+
+        if (split.length > 1) {
+            split.splice(0, 3);
+            href = split.join('/');
+        } 
+
         return `
             <div class='siren-tree-node'>
-                <div class='flex-row-space-between'>
+                <div title='${this._href}' class='flex-row-space-between'>
                     <p class='siren-tree-node-text' onclick='(() => {
                         vscode.postMessage(
                             ${new Event(
@@ -67,7 +75,7 @@ export class TreeItem implements Renderable {
                                 this._href
                             ).toHtml()}
                         );
-                        })()'>${this._href}</p>
+                        })()'>/${href}</p>
                     </p>
                     <button 
                         class='siren-browser-icon-button'
