@@ -53,16 +53,18 @@ export class TreeWebView implements WebviewGenerator, vscode.WebviewViewProvider
     }
 
     private generateHtml(): void {
+        const path = process.env.DEVELOPMENT ?
+            'src\\styles' :
+            'dist\\src\\styles';
+
         const generalStylesPath = vscode.Uri.joinPath(
             this.extensionUri,
-            'src',
-            'styles',
+            path,
             'styles.general.css'
         );
         const treeStylesPath = vscode.Uri.joinPath(
             this.extensionUri,
-            'src',
-            'styles',
+            path,
             'styles.tree.css'
         );
 

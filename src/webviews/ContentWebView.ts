@@ -29,16 +29,18 @@ export class ContentWebView implements WebviewGenerator {
     }
 
     private generateHtml(): void {
+        const path = process.env.DEVELOPMENT ?
+            'src\\styles' :
+            'dist\\src\\styles';
+
         const generalStylesPath = vscode.Uri.joinPath(
             this.extensionUri,
-            'src',
-            'styles',
+            path,
             'styles.general.css'
         );
         const contentStylesPath = vscode.Uri.joinPath(
             this.extensionUri,
-            'src',
-            'styles',
+            path,
             'styles.content.css'
         );
         const generalStylesUri = this.panel.webview.asWebviewUri(generalStylesPath);
