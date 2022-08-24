@@ -119,6 +119,8 @@ export class ContentWebView implements WebviewGenerator {
                             const content = event.data.content;
                             parentHref = href.value;
                             href.value = content.href;
+                            originalToken = content.token;
+                            token.value = content.token;
                             container.innerHTML = content.html;
                             break;
                         default:

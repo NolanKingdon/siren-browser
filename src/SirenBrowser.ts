@@ -101,6 +101,14 @@ class SirenBrowser {
 
             switch (e.type){
                 case EventType.treeLinkClicked:
+                    if(!this._contentView || this._contentView.disposed) {
+                        this._contentView = this.createContentView();
+                    }
+
+                    if(this._contentView && !this._contentView.panel.visible) {
+                        this._contentView.panel.reveal(vscode.ViewColumn.Active);
+                    }
+
                     if(await this.tryFetchAndUpdateContent(e.content, 'GET')){
                         if(this._activeTreeNode) {
                             this._activeTreeNode.isActive = false;
@@ -320,7 +328,7 @@ class SirenBrowser {
                 EventType.contentUpdated,
                 new ContentUpdate(
                     href,
-                    '',
+                    this._authToken,
                     `<h1 style='width: 100%; text-align: center;'>Loading...</h1>`
                 )
             )
@@ -340,7 +348,7 @@ class SirenBrowser {
                         EventType.contentUpdated,
                         new ContentUpdate(
                             href,
-                            '',
+                            this._authToken,
                             `<h1>Error</h1><p>${e.message}</p>`
                         )
                     )
@@ -375,7 +383,7 @@ class SirenBrowser {
                 EventType.contentUpdated,
                 new ContentUpdate(
                     href,
-                    '',
+                    this._authToken,
                     this._raw 
                         ? this._currentEntity.getRaw() 
                         : this._currentEntity.render()
