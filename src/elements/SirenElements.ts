@@ -222,7 +222,6 @@ export class SirenAction extends SirenBase implements Renderable {
     }
 
     public render(): string {
-        // TODO -> Following these
         return `
             ${ 
                 this.fields.length !== 0
@@ -238,16 +237,36 @@ export class SirenAction extends SirenBase implements Renderable {
                                     <td>${field.name}</td>
                                     <td>
                                         <input
-                                            id='${this.name}-${this.method}-${field.name}' 
+                                            id='${this.name}-${this.method}-${field.name}'
                                             class='siren-input'
                                             type='text'
-                                            value=${field.value} 
+                                            value=${field.value}
                                         />
                                 </tr>
                             `).join('')}
                             <tr>
                                 <td colspan="100%">
-                                    <button style="width: 100%" class='siren-browser-button'>Submit</button>
+                                    <button 
+                                        style="width: 100%" 
+                                        class="siren-browser-button"
+                                        onclick="(() => {
+                                            const data = {};
+                                            ${
+                                                this.fields.map( 
+                                                    field => `data[&apos;${field.name}&apos;] = document.querySelector(&apos;#${this.name}-${this.method}-${field.name}&apos;).value;`
+                                                ).join('')
+                                            }
+
+                                            vscode.postMessage({
+                                                type: ${EventType.contentActionClicked},
+                                                content: {
+                                                    href: &apos;${this.href}&apos;,
+                                                    form: data,
+                                                    method: &apos;${this.method}&apos;
+                                                }
+                                            });
+                                        })()"
+                                    >Submit</button>
                                 </td>
                             </tr>
                         </table>

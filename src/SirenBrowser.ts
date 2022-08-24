@@ -100,7 +100,7 @@ class SirenBrowser {
 
             switch (e.type){
                 case EventType.treeLinkClicked:
-                    await this.tryFetchAndUpdateContent(e.content);
+                    await this.tryFetchAndUpdateContent(e.content, 'GET');
                     break;
                 case EventType.treeLinkRemoved:
                     for(let i=0; i<this._treeItems.length; i++) {
@@ -154,19 +154,20 @@ class SirenBrowser {
                 `
             );
 
+            const href = e.content.href;
+
             switch(e.type) {
                 case EventType.contentTokenUpdate:
                     this._authToken = e.content.token;
                     const unchangedHref = e.content.href;
                     
                     // Reload once the new token is assigned
-                    await this.tryFetchAndUpdateContent(unchangedHref);
+                    await this.tryFetchAndUpdateContent(unchangedHref, 'GET');
 
                     break;
                 case EventType.contentHrefUpdate:
                 case EventType.contentLinkClicked:
-                    const href = e.content.href;
-                    if (await this.tryFetchAndUpdateContent(href)) {
+                    if (await this.tryFetchAndUpdateContent(href, 'GET')) {
 
                         const parent = this.getTreeItemByHref(e.content.parent);
 
@@ -185,6 +186,20 @@ class SirenBrowser {
                             new Event(
                                 EventType.treeLinkAdded,
                                 html
+                            )
+                        );
+                    }
+
+                    break;
+                case EventType.contentActionClicked:
+                    const formData = e.content.form;
+                    const method = e.content.method;
+                    
+                    if (await this.tryFetchAndUpdateContent(href, method, formData)) {
+                        this._treeView.sendEvent(
+                            new Event(
+                                EventType.treeLinkAdded,
+                                this.renderAllTreeLinks()
                             )
                         );
                     }
@@ -235,14 +250,30 @@ class SirenBrowser {
         return result;
     }
 
-    private async tryFetchAndUpdateContent(href: string): Promise<boolean> {
-        const options = this._authToken 
-            ? { 
-                headers: {
-                    'authorization': `Bearer ${this._authToken}`
-                }
-             } 
-            : {};
+    private async tryFetchAndUpdateContent(
+        href: string, 
+        method: string, 
+        body?: any
+    ): Promise<boolean> {
+        const options: any = { 
+            method,
+            headers: {
+                'authorization': `Bearer ${this._authToken}`
+            }
+        };
+
+        if(body) {
+            if(method.toLowerCase() === 'get') {
+                // Append as queries to the href
+                href += '?';
+                Object.keys(body).forEach( key => href += `${key}=${body[key]}&`);
+                href.slice(0, -1); // Remove last &
+            } else {
+                // Append body to options
+                options.body = body;
+            }
+        }
+
         const res: any = await fetch(href, options)
             .then(res => {
                 if(res.ok) {
