@@ -8,24 +8,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// TODO 
 	// - Documentation
-	// - Save state so we don't have to reload everything every time we click
-	// - Styles 
-	//		- Better Icon
-	// - Actual Tree
-	//		- Specific styles for highlighted node
-	//		- Delete nodes
-	//		- Short URL display
+	// - Tree View
+	//		- Specific styles for highlighted node *** Priority
 	// - Content View
+	//		- Collapsable Sections
 	//		- Ensure all possible information is represented
 	// - Deactivate functions?
 	// - Named content pages (Display in tree)
+	// - Try extracting JS as much out of the template stuff as possible
+	//		- import JS files saved elsewhere for example
+	// - Refactoring
 
 	// TODO - known bugs
 	//	- Navigating to an existing base entity re-creates that base entity
-	//	- using .map() causes commas to be placed in between all content
-	//	- Content is not saved when navigating off of the tabs
-	// 	- HTML disappears when moving tab position?
-	//	- Links break everything if null
+	//	- Content view does not open when a link is clicked from the history
 }
 
 export function deactivate() {
