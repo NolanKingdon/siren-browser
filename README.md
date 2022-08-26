@@ -11,14 +11,14 @@ To install the extension locally you will need to compile the `vsix` file from s
  - Respond `y` to prompts
  
  *Successful runs will show this message upon completion:*
- ![Successful Compile Terminal Result](https://github.com/NolanKingdon/siren-browser/tree/main/imgs/successfulCompile.png)
+ ![Successful Compile Terminal Result](https://github.com/NolanKingdon/siren-browser/blob/main/imgs/successfulCompile.png)
 #### Part 2 - Load into VSCode
  - Click on the **Extensions** icon in the activity bar 
  - Click on the triple dots in the top right of the **Extensions** window
  - Select `Install from vsix`
  - Locate the `.vsix` (Should be `*/vscode-siren/vscode-siren-[ver].vsix`)
 
-![Manual Install Location](https://github.com/NolanKingdon/siren-browser/tree/main/imgs/manualInstall.png)
+![Manual Install Location](https://github.com/NolanKingdon/siren-browser/blob/main/imgs/manualInstall.png)
 ### Extension Marketplace
 *Currently the extension is not in the extension marketplace*
 
